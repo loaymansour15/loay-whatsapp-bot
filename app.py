@@ -23,8 +23,12 @@ async def send_whatsapp_text(to: str, text: str):
         "Authorization": f"Bearer {WH_TOKEN}",
         "Content-Type": "application/json"
     }
+
     async with httpx.AsyncClient(timeout=20) as client:
-        await client.post(url, headers=headers, json=payload)
+        response = await client.post(url, headers=headers, json=payload)
+        print("WhatsApp API status:", response.status_code)
+        print("WhatsApp API response:", response.text)
+
 
 @app.get("/webhook")
 async def verify_webhook(request: Request):
