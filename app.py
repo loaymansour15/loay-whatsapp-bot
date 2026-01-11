@@ -41,30 +41,38 @@ async def verify_webhook(request: Request):
 
 @app.post("/webhook")
 async def webhook(request: Request):
-    print("Webhook hit")
-
     data = await request.json()
+    print("Webhook data:", data)
 
     try:
-        entry = data["entry"][0]
-        change = entry["changes"][0]
-        value = change["value"]
+        entry = data.get("entry", [])[0]
+        change = entry.get("changes", [])[0]
+        value = change.get("value", {})
+
+        # تجاهل status events
+        if "messages" not in value:
+            return {"ok": True}
+
         message = value["messages"][0]
+
+        if message.get("type") != "text":
+            return {"ok": True}
 
         user_number = message["from"]
         user_text = message["text"]["body"]
+
         print("Message:", user_text)
 
-
-        # رد مبدئي (هنطوره بعدين)
-        if "سعر" in user_text:
+        # رد مبدئي
+        if "سعر" in user_text or "السعر" in user_text:
             reply = "سعر الطرحة X جنيه 👌 تحبي اللون إيه؟"
         else:
             reply = "أهلا 👋 تحبي تعرفي السعر ولا الخامة الأول؟"
 
         await send_whatsapp_text(user_number, reply)
+        print("Reply sent")
 
-    except Exception:
-        pass
+    except Exception as e:
+        print("ERROR:", e)
 
     return {"ok": True}
