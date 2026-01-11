@@ -41,6 +41,8 @@ async def verify_webhook(request: Request):
 
 @app.post("/webhook")
 async def webhook(request: Request):
+    print("Webhook hit")
+
     data = await request.json()
 
     try:
@@ -51,6 +53,8 @@ async def webhook(request: Request):
 
         user_number = message["from"]
         user_text = message["text"]["body"]
+        print("Message:", user_text)
+
 
         # رد مبدئي (هنطوره بعدين)
         if "سعر" in user_text:
